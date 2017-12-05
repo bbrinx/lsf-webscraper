@@ -10,11 +10,16 @@ from dateutil import rrule
 import json
 
 def main():
-    """main class, gets calendar, takes arguments and passes them on"""
-    # room_nr = sys.argv[1]
-    room_nr = 'C 358'
+    """main class, gets calendar, takes arguments and passes them on
+
+    argv[1] is the building A,B,C,D,E,F,G,H
+    argv[2] is the room number
+
+    """
+    building = sys.argv[1]
+    room_nr = sys.argv[2]
     now = datetime.datetime.now()
-    room_id = get_room_id(room_nr)
+    room_id = get_room_id(building+' '+room_nr)
     cal = get_calendar(room_id, now)
     print(is_occupied(now, cal))
 
@@ -31,11 +36,10 @@ def get_calendar(room_id, now):
     :param now: A Datetime, the current date
     """
     week = now.date().isocalendar()[1]
-    year = now.date().isocalendar()[2]
+    year = now.date().isocalendar()[0]
     url = "https://lsf.htw-berlin.de/qisserver/rds?state=wplan&raum.rgid={}&week={}_{}&act=Raum&pool=Raum&show=plan&P.vx=kurz&P.subc=plan".format(room_id, week, year)
     room_plan = requests.get(url)
     soup = BeautifulSoup(room_plan.text, "html.parser")
-    print(soup)
     ical_link = soup.select_one("a[href*=iCalendarPlan]")['href'].encode('ASCII', 'ignore')
     return Calendar.from_ical(requests.get(ical_link).text)
 
@@ -48,7 +52,6 @@ def create_rrule(rule):
                 'TH': rrule.TH, 'FR': rrule.FR}
     freqs = {'YEARLY': rrule.YEARLY, 'MONTHLY': rrule.MONTHLY,
              'WEEKLY': rrule.WEEKLY, 'DAILY': rrule.DAILY}
-
     _freq = str(rule.get('FREQ')[0])
     freq = freqs[_freq]
     until = rule.get('UNTIL')[0].replace(tzinfo=None)
@@ -67,14 +70,22 @@ def is_occupied(now, cal):
     :param cal: A Calendar, from the roomplan website with the current week
     """
     for component in cal.walk('VEVENT'):
-        rule = create_rrule(component.get('RRULE'))
-        start = component.get('DTSTART').dt.time()
-        end = component.get('DTEND').dt.time()
+        start = component.get('DTSTART').dt
+        end = component.get('DTEND').dt
 
-        for date in rule:
-            if now.date() == date.date():
-                if start <= now.time() <= end:
+        if component.get('RRULE') is not None:
+            rule = create_rrule(component.get('RRULE'))
+
+            for date in rule:
+                if now.date() == date.date():
+                    if start.time() <= now.time() <= end.time():
+                        return True
+
+        elif component.get('CATEGORIES') == 'Einzelbuchung':
+            if now.date() == start.date():
+                if start.time() <= now.time() <= end.time():
                     return True
+
 
     return False
 
