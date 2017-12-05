@@ -7,29 +7,21 @@ from bs4 import BeautifulSoup
 import requests
 import re
 from dateutil import rrule
+import json
 
 def main():
     """main class, gets calendar, takes arguments and passes them on"""
     # room_nr = sys.argv[1]
-    room_nr = 'C 158'
+    room_nr = 'C 358'
     now = datetime.datetime.now()
-    print(get_room_id(room_nr))
-    cal = get_calendar(room_nr, now)
+    room_id = get_room_id(room_nr)
+    cal = get_calendar(room_id, now)
     print(is_occupied(now, cal))
 
 def get_room_id(room_nr):
-    link_text = " Wilhelminenhof Gebäude {} - Wilhelminenhof Gebäude C ".format(room_nr)
-    url = "https://lsf.htw-berlin.de/qisserver/rds?state=change&type=6&moduleParameter=raumSelect&nextdir=change&next=SearchSelect.vm&target=raumSearch&subdir=raum&init=y&source=state%3Dchange%26type%3D5%26moduleParameter%3DraumSearch%26nextdir%3Dchange%26next%3Dsearch.vm%26subdir%3Draum%26_form%3Ddisplay%26topitem%3Dfacilities%26subitem%3Dsearch%26function%3Dnologgedin%26field%3Ddtxt&targetfield=dtxt&_form=display"
-    room_list = requests.get(url)
-    soup = BeautifulSoup(room_list.text, "html.parser")
-
-    rooms = soup.find_all("a", "regular")
-    room = rooms.find_all('a', href=True, string=link_text)
-    print('room: {}').format(room)
-    regex_anchor = re.compile('{}(.*){}'.format(re.escape('rgid='), re.escape('&idcol')))
-    anchor = room['href'].encode('ASCII', 'ignore')
-    room_id = regex_anchor.find(anchor)
-    print(room_id)
+    with open('room_ids.json') as json_data:
+        room_dict = json.load(json_data)
+        return room_dict[room_nr]
 
 def get_calendar(room_id, now):
     """ Scrapes the HTW roomplan to get the ical
