@@ -1,7 +1,10 @@
 # -*- coding: iso-8859-15 -*-
-import requests
 import re
+<<<<<<< HEAD
 import json
+=======
+import requests
+>>>>>>> 360ff1f7c977524bf8d5a0a1ddd64cdcf23cc5d0
 from bs4 import BeautifulSoup
 
 url = "https://lsf.htw-berlin.de/qisserver/rds?state=change&type=6&moduleParameter=raumSelect&nextdir=change&next=SearchSelect.vm&target=raumSearch&subdir=raum&init=y&source=state%3Dchange%26type%3D5%26moduleParameter%3DraumSearch%26nextdir%3Dchange%26next%3Dsearch.vm%26subdir%3Draum%26_form%3Ddisplay%26topitem%3Dfacilities%26subitem%3Dsearch%26function%3Dnologgedin%26field%3Ddtxt&targetfield=dtxt&_form=display"

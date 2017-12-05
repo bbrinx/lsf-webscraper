@@ -107,3 +107,13 @@ py3env/
 .mypy_cache/
 
 # End of https://www.gitignore.io/api/python
+
+# VS Code
+.vscode
+
+# More stuff
+py3
+py3env
+bin
+include
+pip-selfcheck.json

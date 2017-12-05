@@ -35,6 +35,7 @@ def get_calendar(room_id, now):
     url = "https://lsf.htw-berlin.de/qisserver/rds?state=wplan&raum.rgid={}&week={}_{}&act=Raum&pool=Raum&show=plan&P.vx=kurz&P.subc=plan".format(room_id, week, year)
     room_plan = requests.get(url)
     soup = BeautifulSoup(room_plan.text, "html.parser")
+    print(soup)
     ical_link = soup.select_one("a[href*=iCalendarPlan]")['href'].encode('ASCII', 'ignore')
     return Calendar.from_ical(requests.get(ical_link).text)
 
