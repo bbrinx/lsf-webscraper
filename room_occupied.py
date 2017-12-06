@@ -9,19 +9,20 @@ import re
 from dateutil import rrule
 import json
 
-def main():
+def main(args):
     """main class, gets calendar, takes arguments and passes them on
 
-    argv[1] is the building A,B,C,D,E,F,G,H
-    argv[2] is the room number
+    args[1] is the building A,B,C,D,E,F,G,H
+    args[2] is the room number
 
     """
-    building = sys.argv[1]
-    room_nr = sys.argv[2]
+    building = args[0]
+    room_nr = args[1]
     now = datetime.datetime.now()
     room_id = get_room_id(building+' '+room_nr)
     cal = get_calendar(room_id, now)
     print(is_occupied(now, cal))
+    return is_occupied(now, cal)
 
 def get_room_id(room_nr):
     with open('room_ids.json') as json_data:
@@ -90,4 +91,4 @@ def is_occupied(now, cal):
     return False
 
 if __name__ == "__main__":
-    main()
+    main(sys.argv[1:])
