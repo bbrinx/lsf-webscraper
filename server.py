@@ -11,10 +11,15 @@ def get_room_occupation():
     room = request.args.get('room')
     if room:
         room_args = re.split('([0-9]+)', room)
-        if '' in room_args:
-            room_args.remove('')
+        print(room_args)
+        room_args = [arg for arg in room_args if arg != '']
+        print(room_args)
         if len(room_args) == 2:
-            occupied = room_occupied.main(room_args)
-            return jsonify(occupied=occupied)
+            try:
+                occupied = room_occupied.main(room_args)
+                return jsonify(occupied=occupied)
+            except KeyError:
+                message = 'Room {0} has no occupation data or does not exist.'.format(room)
+                return jsonify(error=message), 400
         return jsonify(error='Wrong room format. Room must have format C355.'), 400
     return jsonify(error='Please provide a room in the query parameters.'), 400
