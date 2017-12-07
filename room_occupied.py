@@ -16,12 +16,11 @@ def main(args):
     args[2] is the room number
 
     """
-    building = args[0]
+    building = args[0].upper()
     room_nr = args[1]
     now = datetime.datetime.now()
     room_id = get_room_id(building+' '+room_nr)
     cal = get_calendar(room_id, now)
-    print(is_occupied(now, cal))
     return is_occupied(now, cal)
 
 def get_room_id(room_nr):
@@ -41,8 +40,11 @@ def get_calendar(room_id, now):
     url = "https://lsf.htw-berlin.de/qisserver/rds?state=wplan&raum.rgid={}&week={}_{}&act=Raum&pool=Raum&show=plan&P.vx=kurz&P.subc=plan".format(room_id, week, year)
     room_plan = requests.get(url)
     soup = BeautifulSoup(room_plan.text, "html.parser")
-    ical_link = soup.select_one("a[href*=iCalendarPlan]")['href'].encode('ASCII', 'ignore')
-    return Calendar.from_ical(requests.get(ical_link).text)
+    ical_link = soup.select_one("a[href*=iCalendarPlan]")
+    if ical_link is not None:
+        ical_link = ical_link['href'].encode('ASCII', 'ignore')
+        return Calendar.from_ical(requests.get(ical_link).text)
+    raise KeyError
 
 def create_rrule(rule):
     """parses a rule and creates an rrule out of it

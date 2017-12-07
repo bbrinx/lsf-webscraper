@@ -11,9 +11,7 @@ def get_room_occupation():
     room = request.args.get('room')
     if room:
         room_args = re.split('([0-9]+)', room)
-        print(room_args)
         room_args = [arg for arg in room_args if arg != '']
-        print(room_args)
         if len(room_args) == 2:
             try:
                 occupied = room_occupied.main(room_args)
@@ -26,4 +24,3 @@ def get_room_occupation():
 
 if __name__ == '__main__':
     APP.run(debug=True, use_reloader=True)
-
