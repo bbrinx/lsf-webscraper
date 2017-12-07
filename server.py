@@ -23,3 +23,7 @@ def get_room_occupation():
                 return jsonify(error=message), 400
         return jsonify(error='Wrong room format. Room must have format C355.'), 400
     return jsonify(error='Please provide a room in the query parameters.'), 400
+
+if __name__ == '__main__':
+    APP.run(debug=True, use_reloader=True)
+
